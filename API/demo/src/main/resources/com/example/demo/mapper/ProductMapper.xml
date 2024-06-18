@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace="매퍼 인터페이스 경로" --> 
+<mapper namespace="com.example.demo.mapper.ProductMapper">
+
+
+    <select id="list" resultType="Product" >
+        SELECT * FROM product order by no desc
+    </select>
+
+
+
+    <select id="select" resultType="Product">
+        SELECT *
+        FROM product
+        where  no=#{no}
+    </select>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="no">
+        INSERT INTO product( name, quantity, img, price)
+        VALUES ( #{name}, #{quantity}, #{img}, #{price} )
+    </insert>
+
+    <update id="update">
+        UPDATE product 
+        SET 
+        name=#{name},
+        quantity=#{quantity},
+        img=#{img},
+        price=#{price}
+        WHERE no=#{no}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM product
+        where no=#{no}
+    </delete>
+
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace="매퍼 인터페이스 경로" --> 
+<mapper namespace="com.example.demo.mapper.TodoMapper">
+
+
+    <select id="list" resultType="Todo" >
+        SELECT * FROM todo order by status ,no desc
+    </select>
+
+
+
+    <select id="select" resultType="Todo">
+        SELECT *
+        FROM Todo
+        where  no=#{no}
+    </select>
+
+
+    <!-- 
+        😜 useGeneratedKeys
+        : AUTO_INCREMENT 된 값을 KeyProperty에 지정한 변수에 자동으로 담아준다.
+    -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="no">
+
+    <!-- <insert id="insert">
+        <selectKey keyProperty="no" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID() no FROM dual
+        </selectKey> -->
+        INSERT INTO Todo( name)
+        VALUES ( #{name} )
+    </insert>
+
+    <update id="update">
+        UPDATE Todo 
+        SET 
+        status = #{status}
+        WHERE no=#{no}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM Todo
+        where no=#{no}
+    </delete>
+
+    <update id="totalUpdate">
+        UPDATE Todo 
+        SET status=1
+    </update>
+
+    <delete id="totalDelete">
+        DELETE FROM Todo
+    </delete>
+
+</mapper>
