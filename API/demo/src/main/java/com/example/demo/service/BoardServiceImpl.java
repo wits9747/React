@@ -39,39 +39,9 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public int update(Board board) throws Exception {
-        List<MultipartFile> fileList = board.getFiles();
-
-        if (fileList == null || fileList.isEmpty()) {
-            return boardMapper.update(board);
-        }
-
-        // 원래 있던거 지우기
-        List<Files> OldFileList = fileMapper.listByParent(board.getNo());
-        for (Files file : OldFileList) {
-            File oldFile = new File(file.getFilePath());
-            if (oldFile.exists()) {
-                oldFile.delete();
-            }
-
-            // 디비에서 삭제
-            fileMapper.delete(file.getNo());
-        }
-
-        // 파일 업로드
-        Files fileInfo = new Files();
-        String parentTable = "board";
-        fileInfo.setParentTable(parentTable);
-        fileInfo.setParentNo(board.getNo());
-
-        List<Files> uploadedFileList = fileService.uploadFiles(fileInfo, fileList);
-        if (uploadedFileList == null || uploadedFileList.isEmpty()) {
-            log.info("파일 업로드 실패...");
-        } else {
-            log.info("파일 업로드 성공");
-            log.info(uploadedFileList.toString());
-        }
-
-
+         // 파일 업로드
+         int uploadResult =  uploadFiles(board);
+         log.info("파일 " + uploadResult+"개 업로드 되었습니다.");
         return boardMapper.update(board);
     }
 
@@ -79,6 +49,26 @@ public class BoardServiceImpl implements BoardService {
     public int insert(Board board) throws Exception {
         boardMapper.insert(board);
 
+        // 파일 업로드
+        int uploadResult =  uploadFiles(board);
+        log.info("파일 " + uploadResult+"개 업로드 되었습니다.");
+
+        return board.getNo();
+    }
+
+    @Override
+    public int delete(int no) throws Exception {
+        int result = boardMapper.delete(no);
+       
+        List<Files> deleteFileList = fileService.listByParent(no);
+        for (Files deleteFile : deleteFileList) {
+            fileService.delete(deleteFile.getNo());
+        }
+        return result;
+    }
+
+
+    public int uploadFiles(Board board) throws Exception{
         // 파일 업로드
         Files fileInfo = new Files();
         String parentTable = "board";
@@ -95,17 +85,13 @@ public class BoardServiceImpl implements BoardService {
 
         if (uploadedFileList == null || uploadedFileList.isEmpty()) {
             log.info("파일 업로드 실패...");
+            return 0;
         } else {
             log.info("파이 업로드 성공");
             log.info(uploadedFileList.toString());
+            return uploadedFileList.size();
         }
 
-        return board.getNo();
-    }
-
-    @Override
-    public int delete(int no) throws Exception {
-        return boardMapper.delete(no);
     }
 
 }

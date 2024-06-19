@@ -6,3 +6,11 @@ export const upload = (formData, headers) => axios.post(`/files`, formData, head
 
 // 다운로드
 export const download = (no) => axios.get(`/files/${no}`, {responseType: 'blob'})
+
+
+// 삭제
+export const remove = (fileNo) => axios.delete(`/files/${fileNo}`)
+
+
+// 파일 선택 삭제
+export const removeFiles = (fileNos) => axios.delete(`/files?no=${fileNos}`)

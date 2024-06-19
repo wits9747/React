@@ -49,19 +49,20 @@ public class BoardController {
     @GetMapping("/{no}")
     public ResponseEntity<?> getOne(@PathVariable("no") int no) {
         try {
+
+            log.info(no+"이건말이안돼~");
+
             // 게시글
             Board board = boardService.select(no);
 
             // 파일 목록
             List<Files> fileList = fileService.listByParent(no);
-            log.info("뚜로로로로로롱");
 
             Map<String, Object> response = new HashMap<>();
             response.put("board", board);
             response.put("fileList", fileList);
 
             log.info(response.toString());
-            log.info("꾸루꾸루루루룽");
 
 
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -85,7 +86,7 @@ public class BoardController {
     }
     
     @PutMapping()
-    public ResponseEntity<?> update(@RequestBody Board board) {
+    public ResponseEntity<?> update(Board board) {
         try {
             int result = boardService.update(board);
             if(result > 0)

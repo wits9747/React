@@ -26,4 +26,9 @@ public interface FileMapper {
 
     public int download(int no, HttpServletResponse response);
 
+    // 파일 선택 삭제
+    public int deleteFiles(String no);
+    
+    // 파일 목록 삭제 = 부모 테이블 기준
+    public int deleteByParent(Files file);
 }

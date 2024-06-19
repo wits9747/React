@@ -38,8 +38,21 @@
         WHERE no = #{no}
     </delete>
 
+    <!-- 선택삭제 -->
+    <delete id="deleteFiles">
+        DELETE FROM file
+        WHERE no in (${no})
+    </delete>
+
     <!-- <select id="listByParent" resultType="files">
         SELECT * FROM file WHERE parent_no = #{parentNo}
     </select> -->
+
+    <!-- 파일 목록 삭제 -->
+    <delete id="deleteByParent">
+        DELETE FROM file
+        WHERE parent_table = ${parentTable} 
+            AND parent_no = ${parentNo}
+    </delete>
 
 </mapper>
