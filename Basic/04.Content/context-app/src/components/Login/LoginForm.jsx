@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { LoginContext } from '../../contexts/LoginContextProvider'
 import './LoginForm.css'
 const LoginForm = () => {
-    const { login } = useContext(LoginContext)
+    const { login } = useContext(LoginContext) // LoginContext 의 login 함수
 
     const onLogin = (e) => {
         e.preventDefault()

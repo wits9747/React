@@ -3,13 +3,16 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import api from '../apis/api'
 import * as auth from '../apis/auth'
+import * as Swal from '../apis/alert'
 
 // 컨텍스트 생성
 export const LoginContext = createContext()
 
-const Navigate = useNavigate()
+
 
 const LoginContextProvider = ({ children }) => {
+
+    const navigate = useNavigate()
 
     /* -----------------------[State]-------------------------- */
     // 로그인 여부
@@ -75,12 +78,13 @@ const LoginContextProvider = ({ children }) => {
 
         try {
             const response = await auth.login(username, password)
+            console.log(response)
             const data = response.data
             const status = response.status
             const headers = response.headers
-            const Authorizaion = headers.Authorizaion
+            const authorization = headers.authorization
             // JWT
-            const accessToken = Authorizaion.replace("Bearer ", "")
+            const accessToken = authorization.replace("Bearer ", "")
 
             console.log(`data : ${data}`);
             console.log(`status : ${status}`);
@@ -88,18 +92,22 @@ const LoginContextProvider = ({ children }) => {
             console.log(`jwt : ${accessToken}`);
 
             // 로그인 성공
-            if(status == 200) {
+            if (status == 200) {
                 Cookies.set("accessToken", accessToken)
 
                 // 로그인 체크
                 loginCheck()
 
-                // 메인 페이지로 이동
-                Navigate("/")
+                // 
+                Swal.alert("로그인성공", "메인 화면으로 이동합니다.", "success", () => {
+                    // 메인 페이지로 이동
+                    navigate("/")
+                })
             }
 
         } catch (error) {
-            console.log('로그인 실패')
+            console.log(error)
+            Swal.alert("로그인 실패", "아이디 또는 비밀번호가 일치하지 않습니다.", "error")
         }
     }
 
@@ -114,8 +122,8 @@ const LoginContextProvider = ({ children }) => {
         console.log(`authList : ${authList}`);
         console.log(`roleList : ${roleList}`);
 
-        // axios common header - Authorizaion 헤더에 jwt 등록
-        api.defaults.common.headers.Authorization = `Bearer ${accessToken}`
+        // axios common header - Authorization 헤더에 jwt 등록
+        api.defaults.headers.common.Authorization = `Bearer ${accessToken}`
 
         // Context에 정보 등록
         // 로그인 여부 세팅
@@ -149,8 +157,42 @@ const LoginContextProvider = ({ children }) => {
     }
 
 
+    // 로그아웃
+    const logout = () => {
+        // const check = window.confirm("정말로 로그아웃하시겠습니까?")
+
+        // if (check) {
+        //     // 로그아웃 셋팅
+        //     logoutSetting()
+
+        //     // 메인 페이지로 이동
+        //     navigate("/")
+        // }
+
+
+        Swal.confirm("로그아웃하시겠습니까?", "로그아웃을 진행합니다.", "warning",
+            (result) => {
+                // isConfirmed : 확인 버튼 클릭 여부
+                if (result.isConfirmed) {
+                    Swal.alert("로그아웃 성공", "","success")
+                    logoutSetting()
+                    navigate("/")
+                }
+            }
+        )
+    }
+
+    // Mount / Update
+    useEffect(() => {
+        // 로그인 체크
+        loginCheck()
+        // 1. 쿠키에서 jwt을 꺼낸다
+        // 2. jwt가 있으면 서버한테 사용자정보를 받아온다
+        // 3. 로그인 세팅을 한다. (컨텍스트 로그인여부, 사용자정보, 권한정보 등록)
+    }, [])
+
     return (
-        <LoginContext.Provider value={{ isLogin, logout }}>
+        <LoginContext.Provider value={{ isLogin, login, logout }}>
             {children}
         </LoginContext.Provider>
     )
